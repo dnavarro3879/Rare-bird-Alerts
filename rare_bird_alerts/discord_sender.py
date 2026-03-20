@@ -27,7 +27,7 @@ def build_embeds(observations: list[Observation]) -> list[dict]:
         if obs.how_many is not None:
             embed["fields"].append({"name": "Count", "value": str(obs.how_many), "inline": True})
         if obs.image_url:
-            embed["thumbnail"] = {"url": obs.image_url}
+            embed["image"] = {"url": obs.image_url}
         embeds.append(embed)
     return embeds
 

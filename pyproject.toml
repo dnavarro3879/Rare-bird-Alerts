@@ -1,3 +1,10 @@
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "rare-bird-alerts"
 version = "0.1.0"

@@ -25,7 +25,7 @@ async def fetch_bird_image(
         "titles": species_name,
         "format": "json",
         "piprop": "thumbnail",
-        "pithumbsize": 300,
+        "pithumbsize": 800,
     }
 
     should_close = client is None
