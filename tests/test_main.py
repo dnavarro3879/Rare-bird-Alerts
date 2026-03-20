@@ -8,7 +8,7 @@ from tests.conftest import SAMPLE_EBIRD_RESPONSE
 
 
 class TestRun:
-    @patch("rare_bird_alerts.main.send_email")
+    @patch("rare_bird_alerts.main.send_discord_alert")
     @patch("rare_bird_alerts.main.enrich_observations")
     @patch("rare_bird_alerts.main.fetch_notable_observations")
     @patch("rare_bird_alerts.main.Settings")
@@ -17,12 +17,11 @@ class TestRun:
         mock_settings_cls: MagicMock,
         mock_fetch: AsyncMock,
         mock_enrich: AsyncMock,
-        mock_send: MagicMock,
+        mock_send: AsyncMock,
     ) -> None:
         settings = MagicMock()
         settings.region_code = "US-NY"
         settings.days_back = 1
-        settings.email_to = ["test@example.com"]
         mock_settings_cls.return_value = settings
 
         observations = [Observation.model_validate(item) for item in SAMPLE_EBIRD_RESPONSE]
@@ -36,14 +35,14 @@ class TestRun:
 
         mock_fetch.assert_awaited_once_with(settings)
         mock_enrich.assert_awaited_once()
-        mock_send.assert_called_once()
+        mock_send.assert_awaited_once()
 
         send_args = mock_send.call_args
         assert send_args[0][0] is settings
-        assert "Rare Bird Alert" in send_args[0][1]
-        assert "US-NY" in send_args[0][1]
+        assert send_args[0][1] == enriched
+        assert send_args[0][2] == "US-NY"
 
-    @patch("rare_bird_alerts.main.send_email")
+    @patch("rare_bird_alerts.main.send_discord_alert")
     @patch("rare_bird_alerts.main.enrich_observations")
     @patch("rare_bird_alerts.main.fetch_notable_observations")
     @patch("rare_bird_alerts.main.Settings")
@@ -52,12 +51,11 @@ class TestRun:
         mock_settings_cls: MagicMock,
         mock_fetch: AsyncMock,
         mock_enrich: AsyncMock,
-        mock_send: MagicMock,
+        mock_send: AsyncMock,
     ) -> None:
         settings = MagicMock()
         settings.region_code = "US-CA"
         settings.days_back = 1
-        settings.email_to = ["test@example.com"]
         mock_settings_cls.return_value = settings
 
         mock_fetch.return_value = []
@@ -65,4 +63,4 @@ class TestRun:
 
         await run()
 
-        mock_send.assert_called_once()
+        mock_send.assert_awaited_once()

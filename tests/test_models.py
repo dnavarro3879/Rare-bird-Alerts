@@ -50,8 +50,7 @@ class TestSettings:
         assert sample_settings.ebird_api_key == "test_key_123"
         assert sample_settings.region_code == "US-NY"
         assert sample_settings.days_back == 1
-        assert sample_settings.smtp_host == "smtp.gmail.com"
-        assert sample_settings.smtp_port == 587
+        assert sample_settings.discord_webhook_url == "https://discord.com/api/webhooks/test/test"
 
     def test_days_back_range(self) -> None:
         with pytest.raises(ValidationError):
@@ -59,10 +58,7 @@ class TestSettings:
                 ebird_api_key="key",
                 region_code="US",
                 days_back=31,
-                smtp_user="u",
-                smtp_password="p",
-                email_from="a@b.com",
-                email_to=["c@d.com"],
+                discord_webhook_url="https://discord.com/api/webhooks/x/y",
             )
 
     def test_days_back_zero_invalid(self) -> None:
@@ -71,12 +67,5 @@ class TestSettings:
                 ebird_api_key="key",
                 region_code="US",
                 days_back=0,
-                smtp_user="u",
-                smtp_password="p",
-                email_from="a@b.com",
-                email_to=["c@d.com"],
+                discord_webhook_url="https://discord.com/api/webhooks/x/y",
             )
-
-    def test_gmail_defaults(self, sample_settings: Settings) -> None:
-        assert sample_settings.smtp_host == "smtp.gmail.com"
-        assert sample_settings.smtp_port == 587

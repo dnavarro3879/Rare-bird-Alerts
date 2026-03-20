@@ -4,8 +4,8 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 
+from rare_bird_alerts.discord_sender import send_discord_alert
 from rare_bird_alerts.ebird_client import deduplicate_observations, fetch_notable_observations
-from rare_bird_alerts.email_sender import build_email_html, send_email
 from rare_bird_alerts.image_fetcher import enrich_observations
 from rare_bird_alerts.models import Settings
 
@@ -33,11 +33,8 @@ async def run() -> None:
     logger.info("Found images for %d/%d species", images_found, len(observations))
 
     today = datetime.now(tz=UTC).strftime("%B %d, %Y")
-    subject = f"Rare Bird Alert: {settings.region_code} — {today}"
-    html = build_email_html(observations, settings.region_code, today)
-
-    logger.info("Sending email to %s…", ", ".join(settings.email_to))
-    send_email(settings, subject, html)
+    logger.info("Posting alert to Discord…")
+    await send_discord_alert(settings, observations, settings.region_code, today)
     logger.info("Done!")
 
 

@@ -44,12 +44,5 @@ class Settings(BaseSettings):
     region_code: str
     days_back: int = Field(default=1, ge=1, le=30)
 
-    # SMTP (Gmail defaults)
-    smtp_host: str = "smtp.gmail.com"
-    smtp_port: int = 587
-    smtp_user: str
-    smtp_password: str
-
-    # Email
-    email_from: str
-    email_to: list[str]
+    # Discord
+    discord_webhook_url: str

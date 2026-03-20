@@ -92,10 +92,5 @@ def sample_settings() -> Settings:
         ebird_api_key="test_key_123",
         region_code="US-NY",
         days_back=1,
-        smtp_host="smtp.gmail.com",
-        smtp_port=587,
-        smtp_user="test@gmail.com",
-        smtp_password="test_password",
-        email_from="test@gmail.com",
-        email_to=["recipient@example.com"],
+        discord_webhook_url="https://discord.com/api/webhooks/test/test",
     )
