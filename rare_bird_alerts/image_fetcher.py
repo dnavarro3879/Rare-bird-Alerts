@@ -9,8 +9,9 @@ from rare_bird_alerts.models import Observation
 
 logger = logging.getLogger(__name__)
 
-WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php"
+INATURALIST_API_URL = "https://api.inaturalist.org/v1/taxa"
 MAX_CONCURRENT_REQUESTS = 5
+USER_AGENT = "RareBirdAlerts/1.0 (https://github.com/rare-bird-alerts)"
 
 
 async def fetch_bird_image(
@@ -18,20 +19,16 @@ async def fetch_bird_image(
     *,
     client: httpx.AsyncClient | None = None,
 ) -> str | None:
-    """Fetch the main Wikipedia image URL for a bird species by common name."""
-    params = {
-        "action": "query",
-        "prop": "pageimages",
-        "titles": species_name,
-        "format": "json",
-        "piprop": "thumbnail",
-        "pithumbsize": 800,
-    }
+    """Fetch a bird photo URL from iNaturalist by common name."""
+    params = {"q": species_name, "rank": "species", "per_page": 1}
+    headers = {"User-Agent": USER_AGENT}
 
     should_close = client is None
     client = client or httpx.AsyncClient()
     try:
-        resp = await client.get(WIKIPEDIA_API_URL, params=params, timeout=15.0)
+        resp = await client.get(
+            INATURALIST_API_URL, params=params, headers=headers, timeout=15.0
+        )
         resp.raise_for_status()
         data = resp.json()
     except (httpx.HTTPError, ValueError):
@@ -41,11 +38,12 @@ async def fetch_bird_image(
         if should_close:
             await client.aclose()
 
-    pages = data.get("query", {}).get("pages", {})
-    for page in pages.values():
-        thumbnail = page.get("thumbnail")
-        if thumbnail:
-            return thumbnail["source"]
+    results = data.get("results", [])
+    if results:
+        photo = results[0].get("default_photo")
+        if photo:
+            # Use medium_url for a good balance of quality and size
+            return photo.get("medium_url")
     return None
 
 
