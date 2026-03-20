@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -46,3 +46,8 @@ class Settings(BaseSettings):
 
     # Discord
     discord_webhook_url: str
+
+    @field_validator("discord_webhook_url", mode="before")
+    @classmethod
+    def strip_webhook_url(cls, v: str) -> str:
+        return v.strip()
