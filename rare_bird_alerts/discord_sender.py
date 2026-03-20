@@ -14,9 +14,10 @@ def build_embeds(observations: list[Observation]) -> list[dict]:
     """Convert observations into Discord embed dicts."""
     embeds = []
     for obs in observations:
+        aab_url = f"https://www.allaboutbirds.org/guide/{obs.com_name.replace(' ', '_')}/"
         embed: dict = {
             "title": obs.com_name,
-            "description": f"*{obs.sci_name}*",
+            "description": f"*{obs.sci_name}* • [All About Birds]({aab_url})",
             "url": obs.checklist_url,
             "color": EMBED_COLOR,
             "fields": [
@@ -79,8 +80,11 @@ async def send_discord_alert(
 
         for i in range(0, len(all_embeds), MAX_EMBEDS_PER_MESSAGE):
             batch = all_embeds[i : i + MAX_EMBEDS_PER_MESSAGE]
+            payload: dict = {"embeds": batch}
+            if i == 0:
+                payload["content"] = "@here"
             resp = await client.post(
-                settings.discord_webhook_url, json={"embeds": batch}, timeout=30.0
+                settings.discord_webhook_url, json=payload, timeout=30.0
             )
             resp.raise_for_status()
     finally:

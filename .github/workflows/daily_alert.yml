@@ -2,8 +2,8 @@ name: Daily Rare Bird Alert
 
 on:
   schedule:
-    # Run daily at 1pm UTC (adjust to your timezone preference)
-    - cron: '0 13 * * *'
+    # Run daily at 8am MDT (UTC-6) / 7am MST (UTC-7) — close enough year-round
+    - cron: '0 14 * * *'
   workflow_dispatch: # Allow manual triggers
 
 jobs:
